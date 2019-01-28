@@ -426,7 +426,7 @@ class AlgoliaService {
                     break;
 
                 case "publicationDate":
-                    $mappedFields[$field] = $this->formatPublicationDate($article);
+                    $mappedFields[$field] = $this->formatPublicationDate($article, true);
                     break;
             }
 
@@ -443,10 +443,8 @@ class AlgoliaService {
             return $article->getDatePublished();
         }else{
             // for example:
-            // $publishedDate = date_create($article->getDatePublished());
-            // return date_format($publishedDate, "F Y");
-
-            return $article->getDatePublished();
+            $publishedDate = date_create($article->getDatePublished());
+            return date_format($publishedDate, "F Y");
         }
     }
 
