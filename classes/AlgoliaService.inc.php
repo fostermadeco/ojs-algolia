@@ -433,7 +433,7 @@ class AlgoliaService {
         }
 
         $mappedFields['section'] = $article->getSectionTitle();
-        $mappedFields['url'] = $this->formatUrl($article);
+        $mappedFields['url'] = $this->formatUrl($article, true);
 
         return $mappedFields;
     }
@@ -465,10 +465,7 @@ class AlgoliaService {
         if(!$custom){
             return "/" . $acronym . "/view/" . $article->getId();
         }else{
-            // for example:
-            // return "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
-            
-            return "/" . $acronym . "/view/" . $article->getId();
+            return "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
         }
 
     }
