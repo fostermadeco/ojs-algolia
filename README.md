@@ -9,7 +9,7 @@ Plugin integrating OJS and Algolia
 - Composer
 
 ## Installation
-- Download the zip for this repository, place it into `plugin/generic` and extract it using the command below:
+- Download the zip for this repository, place it into `plugin/generic` and extract it using this command:
   `unzip ojs-algolia-master.zip && mv ojs-algolia-master algolia && rm -f ojs-algolia-master.zip`
 - In the plugin directory, run `composer install`
 - In Settings > Website > Plugins, activate the plugin
