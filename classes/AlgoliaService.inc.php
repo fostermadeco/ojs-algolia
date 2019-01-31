@@ -27,6 +27,7 @@ define('ALGOLIA_INDEXING_MAX_BATCHSIZE', 200);
 
 import('classes.search.ArticleSearch');
 import('plugins.generic.algolia.classes.AlgoliaEngine');
+import('lib.pkp.classes.config.Config');
 
 class AlgoliaService {
     var $indexer = null;
@@ -449,6 +450,8 @@ class AlgoliaService {
     }
 
     function formatUrl($article, $custom = false){
+        $baseUrl = Config::getVar('general', 'base_url');
+
         $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
         $publishedArticle = $publishedArticleDao->getByArticleId($article->getId());
         $sequence = $publishedArticle->getSequence();
@@ -463,9 +466,9 @@ class AlgoliaService {
         $acronym = $journal->getLocalizedAcronym();
 
         if(!$custom){
-            return "/" . $acronym . "/view/" . $article->getId();
+            return $baseUrl . "/" . $acronym . "/view/" . $article->getId();
         }else{
-            return "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
+            return $baseUrl . "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
         }
 
     }
