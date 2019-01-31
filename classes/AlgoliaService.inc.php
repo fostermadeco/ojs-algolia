@@ -507,9 +507,19 @@ class AlgoliaService {
 
     function formatAbstract($article){
         $content = $article->getAbstract(null);
-
-        // $wordArray = explode(' ', $content[$article->getLocale()]);
         
-        return $content;
+        $data = array();
+        foreach($content as $locale => $text){
+            $new_text = str_replace("</p>", "", $text);
+            $chunked_text = explode("<p>", wordwrap($new_text, 250));
+
+            foreach($chunked_text as $chunked){
+                if($chunked){
+                    $data[$locale] = strip_tags($chunked);
+                }
+            }
+        }
+
+        return $data;
     }
 }
