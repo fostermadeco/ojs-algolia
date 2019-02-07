@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * @file plugins/generic/algolia/classes/AlgoliaEngine.inc.php
+ *
+ * Copyright (c) 2019 Jun Kim / Foster Made, LLC
+ * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ *
+ * @class AlgoliaEngine
+ * @ingroup plugins_generic_algolia_classes
+ *
+ * @brief This handles the addition and deletion of object/records in Algolia.
+ */
+
 require_once dirname(dirname(__FILE__)) . '/lib/vendor/autoload.php';
 
 use AlgoliaSearch\Client;
@@ -113,15 +125,5 @@ class AlgoliaEngine {
         } catch (AlgoliaException $e) {
             return $e->getMessage();
         }
-    }
-
-    /**
-     * Sets the index prefix based on environment
-     *
-     * @return string
-     */
-    protected function setIndexEnv()
-    {
-        return defined('ENV') ? ENV . '_' : '';
     }
 }

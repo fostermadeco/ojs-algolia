@@ -24,8 +24,8 @@ class AlgoliaPlugin extends GenericPlugin {
     // Getters and Setters
     //
     /**
-     * Get the solr web service.
-     * @return SolrWebService
+     * Get the Algolia service.
+     * @return AlgoliaService
      */
     function getAlgoliaService() {
         return $this->_algoliaService;
@@ -216,8 +216,6 @@ class AlgoliaPlugin extends GenericPlugin {
      * This fires after an article has been published
      */
     function callbackArticleChangesFinished($hookName, $params) {
-        error_log(">>> callbackArticleChangesFinished\n", 3, "/var/www/ojs.dev/dump");
-        error_log(print_r($params, 1), 3, "/var/www/ojs.dev/dump");
         // In the case of pull-indexing we ignore this call
         // and let the Solr server initiate indexing.
         // if ($this->getSetting(CONTEXT_SITE, 'pullIndexing')) return true;
