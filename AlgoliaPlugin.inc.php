@@ -24,8 +24,8 @@ class AlgoliaPlugin extends GenericPlugin {
     // Getters and Setters
     //
     /**
-     * Get the solr web service.
-     * @return SolrWebService
+     * Get the Algolia service.
+     * @return AlgoliaService
      */
     function getAlgoliaService() {
         return $this->_algoliaService;
