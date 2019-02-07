@@ -389,7 +389,7 @@ class AlgoliaService {
                     break;
 
                 case "publicationDate":
-                    $mappedFields[$field] = $this->formatPublicationDate($article);
+                    $mappedFields[$field] = strtotime($article->getDatePublished());
                     break;
             }
 
@@ -399,18 +399,6 @@ class AlgoliaService {
         $mappedFields['url'] = $this->formatUrl($article);
 
         return $mappedFields;
-    }
-
-    function formatPublicationDate($article, $custom = false){
-        if(!$custom){
-            return $article->getDatePublished();
-        }else{
-            // for example:
-            // $publishedDate = date_create($article->getDatePublished());
-            // return date_format($publishedDate, "F Y");
-
-            return $article->getDatePublished();
-        }
     }
 
     function formatUrl($article, $custom = false){
