@@ -8,7 +8,7 @@
  * Copyright (c) 2019 Jun Kim / Foster Made, LLC
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class SolrWebService
+ * @class AlgoliaService
  * @ingroup plugins_generic_algolia_classes
  *
  * @brief Indexes content into Algolia
@@ -137,10 +137,9 @@ class AlgoliaService {
     }
 
     /**
-     * (Re-)indexes all changed articles in Solr.
+     * (Re-)indexes all changed articles in Algolia.
      *
-     * This is the push-indexing implementation of the Solr
-     * web service.
+     * This is 'pushing' the content to Algolia.
      *
      * To control memory usage and response time we
      * index articles in batches. Batches should be as
@@ -150,11 +149,6 @@ class AlgoliaService {
      *  to be indexed in this run.
      * @param $journalId integer If given, restrains index
      *  updates to the given journal.
-     *
-     * @return integer The number of articles processed or
-     *  null if an error occurred. After an error the method
-     *  SolrWebService::getServiceMessage() will return details
-     *  of the error.
      */
     function pushChangedArticles($batchSize = ALGOLIA_INDEXING_MAX_BATCHSIZE, $journalId = null) {
         // Retrieve a batch of "changed" articles.
@@ -194,7 +188,7 @@ class AlgoliaService {
     }
 
     /**
-     * Deletes the given article from the Solr index.
+     * Deletes the given article from Algolia.
      *
      * @param $articleId integer The ID of the article to be deleted.
      *
@@ -213,7 +207,7 @@ class AlgoliaService {
 
     /**
      * Deletes all articles of a journal or of the
-     * installation from the Solr index.
+     * installation from Algolia.
      *
      * @param $journalId integer If given, only articles
      *  from this journal will be deleted.
@@ -268,37 +262,6 @@ class AlgoliaService {
                 'publicationDate' => 'publicationDate_dt'
             )
         );
-    }
-
-    /**
-     * Convert a date from local time (unix timestamp
-     * or ISO date string) to UTC time as understood
-     * by solr.
-     *
-     * NB: Using intermediate unix timestamps can be
-     * a problem in older PHP versions, especially on
-     * Windows where negative timestamps are not supported.
-     *
-     * As Solr requires PHP5 that should not be a big
-     * problem in practice, except for electronic
-     * publications that go back until earlier than 1901.
-     * It does not seem probable that such a situation
-     * could realistically arise with OJS.
-     *
-     * @param $timestamp int|string Unix timestamp or local ISO time.
-     * @return string ISO UTC timestamp
-     */
-    function _convertDate($timestamp) {
-        if (is_numeric($timestamp)) {
-            // Assume that this is a unix timestamp.
-            $timestamp = (integer) $timestamp;
-        } else {
-            // Assume that this is an ISO timestamp.
-            $timestamp = strtotime($timestamp);
-        }
-
-        // Convert to UTC as understood by solr.
-        return gmdate('Y-m-d\TH:i:s\Z', $timestamp);
     }
 
     /**
