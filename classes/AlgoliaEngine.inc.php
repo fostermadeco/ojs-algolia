@@ -12,7 +12,7 @@
  * @brief This handles the addition and deletion of object/records in Algolia.
  */
 
-require_once dirname(dirname(__FILE__)) . '/lib/vendor/autoload.php';
+require_once dirname(dirname(__FILE__)) . '/libs/vendor/autoload.php';
 
 use AlgoliaSearch\Client;
 use AlgoliaSearch\AlgoliaException;

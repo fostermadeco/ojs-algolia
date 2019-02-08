@@ -3,6 +3,6 @@
         "algolia/algoliasearch-client-php": "^1.27"
     },
     "config": {
-        "vendor-dir": "lib/vendor"
+        "vendor-dir": "libs/vendor"
     }
 }
