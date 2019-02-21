@@ -23,7 +23,7 @@ define('ALGOLIA_INDEXINGSTATE_CLEAN', false);
 
 // // The max. number of articles that can
 // // be indexed in a single batch.
-define('ALGOLIA_INDEXING_MAX_BATCHSIZE', 200);
+define('ALGOLIA_INDEXING_MAX_BATCHSIZE', 2000);
 
 import('classes.search.ArticleSearch');
 import('plugins.generic.algolia.classes.AlgoliaEngine');
@@ -42,11 +42,6 @@ class AlgoliaService {
         }
 
         $this->indexer = new AlgoliaEngine($settingsArray);
-    }
-
-    // testing...
-    function getIndexes() {
-        return $this->indexer->get_indexes();
     }
 
     //
@@ -184,7 +179,9 @@ class AlgoliaService {
             $this->indexer->delete($toDelete);
         }
 
-        $this->indexer->index($toAdd);
+        foreach($toAdd as $add){
+            $this->indexer->index($add);
+        }
     }
 
     /**
@@ -309,11 +306,22 @@ class AlgoliaService {
 
         $baseData = array(
             "objectAction" => "addObject",
-            "objectID" => $article->getId(),
-            "id" => $article->getId(),
+            "distinctId" => $article->getId(),
         );
 
-        return array_merge($baseData, $this->mapAlgoliaFieldsToIndex($article));
+        $objects = array();
+
+        $articleData = $this->mapAlgoliaFieldsToIndex($article);
+        foreach($articleData['body'] as $i => $chunks){
+            if(trim($chunks)){
+                $baseData['objectID'] = $baseData['distinctId'] . "_" . $i;
+                $chunkedData = $articleData;
+                $chunkedData['body'] = $chunks;
+                $objects[] = array_merge($baseData, $chunkedData);
+            }
+        }
+
+        return $objects;
     }
 
     function buildAlgoliaObjectDelete($articleOrArticleId){
@@ -379,9 +387,8 @@ class AlgoliaService {
                     $mappedFields[$field] = (array) $article->getCoverage(null);
                     break;
 
-                // todo...this isn't right
                 case "galleyFullText":
-                    $mappedFields[$field] = $article->getTitle(null);
+                    $mappedFields[$field] = $this->getGalleyHTML($article);
                     break;
 
                 case "authors":
@@ -397,6 +404,11 @@ class AlgoliaService {
 
         $mappedFields['section'] = $article->getSectionTitle();
         $mappedFields['url'] = $this->formatUrl($article);
+
+        // combine abstract and galleyFullText into body and unset them
+        $mappedFields['body'] = array_merge($mappedFields['abstract'], $mappedFields['galleyFullText']);
+        unset($mappedFields['abstract']);
+        unset($mappedFields['galleyFullText']);
 
         return $mappedFields;
     }
@@ -416,12 +428,12 @@ class AlgoliaService {
         $acronym = $journal->getLocalizedAcronym();
 
         if(!$custom){
-            return "/" . $acronym . "/view/" . $article->getId();
+            return Config::getVar('general', 'base_url') . "/" . $acronym . "/view/" . $article->getId();
         }else{
             // for example:
             // return "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
             
-            return "/" . $acronym . "/view/" . $article->getId();
+            return Config::getVar('general', 'base_url') . "/" . $acronym . "/view/" . $article->getId();
         }
 
     }
@@ -462,10 +474,57 @@ class AlgoliaService {
     }
 
     function formatAbstract($article){
-        $content = $article->getAbstract(null);
+        return $this->chunkContent($article->getAbstract($article->getLocale()));
+    }
 
-        // $wordArray = explode(' ', $content[$article->getLocale()]);
-        
-        return $content;
+    function getGalleyHTML($article){
+        $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+        $publishedArticle = $publishedArticleDao->getByArticleId($article->getId());
+
+        $contents = "";
+
+        $galleys = $publishedArticle->getGalleys();
+        foreach($galleys as $galley){
+            if($galley->getFileType() == "text/html"){
+                $submissionFile = $galley->getFile();
+                $contents = file_get_contents($submissionFile->getFilePath());
+
+                $contents = preg_replace(
+                    '/([Ss][Rr][Cc]|[Hh][Rr][Ee][Ff]|[Dd][Aa][Tt][Aa])\s*=\s*"([^"]*' . $pattern . ')"/',
+                    '\1="' . $fileUrl . '"',
+                    $contents
+                );
+
+                // Replacement for Flowplayer
+                $contents = preg_replace(
+                    '/[Uu][Rr][Ll]\s*\:\s*\'(' . $pattern . ')\'/',
+                    'url:\'' . $fileUrl . '\'',
+                    $contents
+                );
+
+                // Replacement for other players (ested with odeo; yahoo and google player won't work w/ OJS URLs, might work for others)
+                $contents = preg_replace(
+                    '/[Uu][Rr][Ll]=([^"]*' . $pattern . ')/',
+                    'url=' . $fileUrl ,
+                    $contents
+                );
+            }
+        }
+
+        return $this->chunkContent($contents);
+    }
+
+    function chunkContent($content){
+        $data = array();
+        $updated_content = html_entity_decode($content);
+        $chunked_content = explode("</p>", wordwrap($updated_content, ALGOLIA_WORDCOUNT_SPLIT));
+
+        foreach($chunked_content as $chunked){
+            if($chunked){
+                $data[] = strip_tags($chunked);
+            }
+        }
+
+        return $data;
     }
 }
