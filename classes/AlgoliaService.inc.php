@@ -414,6 +414,8 @@ class AlgoliaService {
     }
 
     function formatUrl($article, $custom = false){
+        $baseUrl = Config::getVar('general', 'base_url');
+
         $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
         $publishedArticle = $publishedArticleDao->getByArticleId($article->getId());
         $sequence = $publishedArticle->getSequence();
@@ -428,14 +430,10 @@ class AlgoliaService {
         $acronym = $journal->getLocalizedAcronym();
 
         if(!$custom){
-            return Config::getVar('general', 'base_url') . "/" . $acronym . "/view/" . $article->getId();
+            return $baseUrl . "/" . $acronym . "/view/" . $article->getId();
         }else{
-            // for example:
-            // return "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
-            
-            return Config::getVar('general', 'base_url') . "/" . $acronym . "/view/" . $article->getId();
+            return $baseUrl . "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
         }
-
     }
 
     function getAuthors($article){
