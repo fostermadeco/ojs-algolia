@@ -44,11 +44,6 @@ class AlgoliaService {
         $this->indexer = new AlgoliaEngine($settingsArray);
     }
 
-    // testing...
-    function getIndexes() {
-        return $this->indexer->get_indexes();
-    }
-
     //
     // Getters and Setters
     //
