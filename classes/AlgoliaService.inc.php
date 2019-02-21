@@ -365,7 +365,7 @@ class AlgoliaService {
         foreach($fieldsToIndex as $field){
             switch($field){
                 case "title":
-                    $mappedFields[$field] = $article->getTitle(null);
+                    $mappedFields[$field] = $this->formatTitle($article);
                     break;
 
                 case "abstract":
@@ -534,5 +534,11 @@ class AlgoliaService {
         }
 
         return $data;
+    }
+
+    function formatTitle($article){
+        $title = $article->getTitle(null);
+
+        return preg_replace("/<.*?>/", "", $title);
     }
 }
