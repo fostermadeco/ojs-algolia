@@ -41,7 +41,7 @@
     <message key="plugins.generic.algolia.settings.indexRebuild">Rebuild index</message>
     <message key="plugins.generic.algolia.settings.indexRebuild.confirm">Rebuilding the index and/or dictionaries can take a long time. Are you sure you want to proceed?</message>
     <message key="plugins.generic.algolia.settings.indexRebuildAllJournals">Rebuild index for all journals</message>
-    <message key="plugins.generic.algolia.settings.indexRebuildDescription">add content here</message>
+    <message key="plugins.generic.algolia.settings.indexRebuildDescription">Used to reindex all content from either one or all journals.</message>
     <message key="plugins.generic.algolia.settings.indexRebuildJournal">Rebuild index for journal "{$journalName}"</message>
     <message key="plugins.generic.algolia.settings.indexAdministration">Index Administration</message>
 </locale>
