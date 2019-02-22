@@ -43,10 +43,11 @@
         <span class="instruct">{translate key="plugins.generic.algolia.settings.adminKeyInstructions"}</span>
         <div class="separator"></div>
         <br>
+
+        <span class="formRequired">{translate key="common.requiredField"}</span>
     {/fbvFormArea}
 
     {fbvFormButtons}
-    <p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 
     <a id="indexAdmin"> </a>
     <h3>{translate key="plugins.generic.algolia.settings.indexAdministration"}</h3>
