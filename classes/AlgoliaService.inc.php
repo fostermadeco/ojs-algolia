@@ -410,7 +410,7 @@ class AlgoliaService {
         }
 
         $mappedFields['section'] = $article->getSectionTitle();
-        $mappedFields['url'] = $this->formatUrl($article, true);
+        $mappedFields['url'] = $this->formatUrl($article);
 
         // combine abstract and galleyFullText into body and unset them
         $mappedFields['body'] = array_merge($mappedFields['abstract'], $mappedFields['galleyFullText']);
@@ -447,9 +447,9 @@ class AlgoliaService {
         $acronym = $journal->getLocalizedAcronym();
 
         if(!$custom){
-            return $baseUrl . "/" . $acronym . "/view/" . $article->getId();
+            return $baseUrl . "/" . strtolower($acronym) . "/article/view/" . $article->getId();
         }else{
-            return $baseUrl . "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
+            return $baseUrl . "/" . strtolower($acronym) . "/article/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
         }
     }
 
