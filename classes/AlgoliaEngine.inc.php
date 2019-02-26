@@ -126,4 +126,24 @@ class AlgoliaEngine {
             return $e->getMessage();
         }
     }
+
+    /**
+     * Deletes an object by distictId
+     * @param  $distinctId
+     * @return bool
+     */
+    public function deleteByDistinctId($distinctId)
+    {
+        $index = $this->client->initIndex($this->index);
+
+        try {
+            $index->deleteBy([
+                'filters' => 'distinctId:' . $distinctId,
+            ]);
+        } catch (AlgoliaException $e) {
+            return $e->getMessage();
+        }
+
+        return true;
+    }
 }

@@ -21,9 +21,12 @@
 define('ALGOLIA_INDEXINGSTATE_DIRTY', true);
 define('ALGOLIA_INDEXINGSTATE_CLEAN', false);
 
-// // The max. number of articles that can
-// // be indexed in a single batch.
+// The max. number of articles that can
+// be indexed in a single batch.
 define('ALGOLIA_INDEXING_MAX_BATCHSIZE', 2000);
+
+// Number of words to split
+define('ALGOLIA_WORDCOUNT_SPLIT', 250);
 
 import('classes.search.ArticleSearch');
 import('plugins.generic.algolia.classes.AlgoliaEngine');
@@ -177,7 +180,9 @@ class AlgoliaService {
             unset($toDelete);
             $this->indexer->clear_index();
         }else{
-            $this->indexer->delete($toDelete);
+            foreach($toDelete as $delete){
+                $this->indexer->deleteByDistinctId($delete['distinctId']);
+            }
         }
 
         foreach($toAdd as $add){
@@ -200,7 +205,9 @@ class AlgoliaService {
 
         $toDelete = array();
         $toDelete[] = $this->buildAlgoliaObjectDelete($articleId);
-        $this->indexer->delete($toDelete);
+        foreach($toDelete as $delete){
+            $this->indexer->deleteByDistinctId($delete['distinctId']);
+        }
     }
 
     /**
@@ -329,13 +336,13 @@ class AlgoliaService {
         if(!is_numeric($articleOrArticleId)) {
             return array(
                 "objectAction" => "deleteObject",
-                "objectID" => $articleOrArticleId->getId(),
+                "distinctId" => $articleOrArticleId->getId(),
             );
         }
 
         return array(
             "objectAction" => "deleteObject",
-            "objectID" => $articleOrArticleId,
+            "distinctId" => $articleOrArticleId,
         );
     }
 
@@ -495,27 +502,7 @@ class AlgoliaService {
         foreach($galleys as $galley){
             if($galley->getFileType() == "text/html"){
                 $submissionFile = $galley->getFile();
-                $contents = file_get_contents($submissionFile->getFilePath());
-
-                $contents = preg_replace(
-                    '/([Ss][Rr][Cc]|[Hh][Rr][Ee][Ff]|[Dd][Aa][Tt][Aa])\s*=\s*"([^"]*' . $pattern . ')"/',
-                    '\1="' . $fileUrl . '"',
-                    $contents
-                );
-
-                // Replacement for Flowplayer
-                $contents = preg_replace(
-                    '/[Uu][Rr][Ll]\s*\:\s*\'(' . $pattern . ')\'/',
-                    'url:\'' . $fileUrl . '\'',
-                    $contents
-                );
-
-                // Replacement for other players (ested with odeo; yahoo and google player won't work w/ OJS URLs, might work for others)
-                $contents = preg_replace(
-                    '/[Uu][Rr][Ll]=([^"]*' . $pattern . ')/',
-                    'url=' . $fileUrl ,
-                    $contents
-                );
+                $contents .= file_get_contents($submissionFile->getFilePath());
             }
         }
 
@@ -525,12 +512,19 @@ class AlgoliaService {
     function chunkContent($content){
         $data = array();
         $updated_content = html_entity_decode($content);
-        $chunked_content = explode("</p>", wordwrap($updated_content, ALGOLIA_WORDCOUNT_SPLIT));
 
-        foreach($chunked_content as $chunked){
-            if($chunked){
-                $data[] = strip_tags($chunked);
+        if($updated_content){
+            $temp_content = str_replace("</p>", "", $updated_content);
+            $chunked_content = preg_split("/<p[^>]*?(\/?)>/i", $temp_content);
+
+            foreach($chunked_content as $chunked){
+                if($chunked){
+                    $tagless_content = strip_tags($chunked);
+                    $data[] = trim(wordwrap($tagless_content, ALGOLIA_WORDCOUNT_SPLIT));
+                }
             }
+        }else{
+            $data[] = trim(strip_tags($updated_content));
         }
 
         return $data;
