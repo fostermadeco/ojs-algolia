@@ -447,9 +447,9 @@ class AlgoliaService {
         $acronym = $journal->getLocalizedAcronym();
 
         if(!$custom){
-            return $baseUrl . "/" . strtolower($acronym) . "/article/view/" . $article->getId();
+            return $baseUrl . "/index.php/" . strtolower($acronym) . "/article/view/" . $article->getId();
         }else{
-            return $baseUrl . "/" . strtolower($acronym) . "/article/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
+            return $baseUrl . "/index.php/" . strtolower($acronym) . "/article/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
         }
     }
 
