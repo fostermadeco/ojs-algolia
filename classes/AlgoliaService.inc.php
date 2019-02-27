@@ -325,6 +325,7 @@ class AlgoliaService {
                 $baseData['objectID'] = $baseData['distinctId'] . "_" . $i;
                 $chunkedData = $articleData;
                 $chunkedData['body'] = $chunks;
+                $chunkedData['order'] = $i + 1;
                 $objects[] = array_merge($baseData, $chunkedData);
             }
         }
