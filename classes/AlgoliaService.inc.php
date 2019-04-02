@@ -434,8 +434,8 @@ class AlgoliaService {
     function formatUrl($article, $custom = false){
         $baseUrl = Config::getVar('general', 'base_url');
 
-        if(!preg_match("#index\.php#", $baseUrl)){
-            $baseUrl .= "index.php";
+        if(!preg_match("#/index\.php#", $baseUrl)){
+            $baseUrl .= "/index.php";
         }
 
         $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
