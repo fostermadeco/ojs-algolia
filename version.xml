@@ -15,8 +15,8 @@
 <version>
 	<application>algolia</application>
 	<type>plugins.generic</type>
-	<release>0.4.1</release>
-	<date>2019-01-17</date>
+	<release>0.4.5</release>
+	<date>2019-04-08</date>
 	<lazy-load>1</lazy-load>
 	<sitewide>1</sitewide>
 	<class>AlgoliaPlugin</class>

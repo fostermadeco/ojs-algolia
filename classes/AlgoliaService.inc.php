@@ -325,6 +325,7 @@ class AlgoliaService {
                 $baseData['objectID'] = $baseData['distinctId'] . "_" . $i;
                 $chunkedData = $articleData;
                 $chunkedData['body'] = $chunks;
+                $chunkedData['order'] = $i + 1;
                 $objects[] = array_merge($baseData, $chunkedData);
             }
         }
@@ -407,7 +408,6 @@ class AlgoliaService {
                     $mappedFields[$field] = strtotime($article->getDatePublished());
                     break;
             }
-
         }
 
         $mappedFields['section'] = $article->getSectionTitle();
@@ -421,8 +421,22 @@ class AlgoliaService {
         return $mappedFields;
     }
 
+    function formatPublicationDate($article, $custom = false){
+        if(!$custom){
+            return $article->getDatePublished();
+        }else{
+            // for example:
+            $publishedDate = date_create($article->getDatePublished());
+            return date_format($publishedDate, "F Y");
+        }
+    }
+
     function formatUrl($article, $custom = false){
         $baseUrl = Config::getVar('general', 'base_url');
+
+        if(!preg_match("#/index\.php#", $baseUrl)){
+            $baseUrl .= "/index.php";
+        }
 
         $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
         $publishedArticle = $publishedArticleDao->getByArticleId($article->getId());
@@ -438,9 +452,10 @@ class AlgoliaService {
         $acronym = $journal->getLocalizedAcronym();
 
         if(!$custom){
-            return $baseUrl . "/" . $acronym . "/view/" . $article->getId();
+            return $baseUrl . "/" . strtolower($acronym) . "/article/view/" . $article->getId();
         }else{
-            return $baseUrl . "/" . $acronym . "/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
+            // as an example...format your custom url how you'd like
+            return $baseUrl . "/" . strtolower($acronym) . "/article/view/" . $acronym . $volume . "." . $number . "." . str_pad($number, 2, "0", STR_PAD_LEFT);
         }
     }
 
